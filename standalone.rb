@@ -2,7 +2,6 @@ require 'rubygems'
 require 'twitter/json_stream'
 require "eventmachine"
 require "em-websocket"
-require "json"
 require 'pit'
 
 query = ARGV.shift
