@@ -1,0 +1,59 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html>
+<head>
+  <script src='http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js'></script>
+  <script>
+  $(document).ready(function(){
+    function videoId(text) {
+      if(text.match(/http:\/\/(www\.)?youtube\.com\/watch\?v=([0-9a-zA-Z\-_]+)/)) {
+        return RegExp.$2;
+      }
+      return null;
+    }
+
+    if(!("WebSocket" in window)) {
+      alert("Sorry, the build of your browser does not support WebSockets.");
+      return;
+    }
+
+    ws = new WebSocket("ws://localhost:8080/");
+    ws.onmessage = function(evt) {
+      data = eval("(" + evt.data + ")");
+
+      var youtube = videoId(data.text);
+
+      if(youtube && Math.random() > 0.75) {
+        var string  = '<object width="192" height="154">';
+            string += '<param name="movie" value="http://www.youtube.com/v/' + youtube + '&fs=1&autoplay=1"></param>';
+            string += '<param name="allowFullScreen" value="true"></param>';
+            string += '<param name="allowscriptaccess" value="always"></param>';
+            string += '<embed src="http://www.youtube.com/v/' + youtube + '&fs=1&autoplay=1" type="application/x-shockwave-flash"';
+            string += ' allowscriptaccess="always" allowfullscreen="true" width="192" height="154"></embed></object>';
+        var object = $(string);
+
+        if($('#tweets object').size() > 20) {
+          $('#tweets object:last').slideDown(100, function() {
+            $(this).remove();
+          });
+        }
+
+        $('#tweets').prepend(object);
+        object.slideDown(140);
+      }
+    };
+
+    ws.onclose = function() {
+      alert("socket closed");
+    };
+
+    ws.onopen = function() {
+      //alert("connected...");
+    };
+  });
+  </script>
+</head>
+<body>
+  <div id="tweets">
+  </div>
+</body>
+</html>
